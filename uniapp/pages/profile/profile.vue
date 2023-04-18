@@ -13,16 +13,7 @@
 					</text>
 				</view>
 			</view>
-			<!--vip信息-->
 			<view class="vip-card-box">
-				<view class="b-btn">
-					{{'市场部'}}
-				</view>
-				<view class="tit">
-					<i class="iconfont iconzuanshi" />
-					{{ siteInfo.web_site_title || '未知' }}
-				</view>
-				<text class="e-m">{{ siteInfo.web_contact || '技术支持QQ:21931118' }}</text>
 			</view>
 		</view>
 		<!-- 个人中心 内容区-->
@@ -33,27 +24,6 @@
 						}
 					]" @touchstart="coverTouchstart" @touchmove="coverTouchmove" @touchend="coverTouchend">
 			<image class="arc" :src="arc"></image>
-			<!--个人中心-->
-			<view class="promotion-center">
-				<oa-list-cell icon="iconfenlei" :iconColor="themeColor.color" navigateType=""
-					:title="applicationList.title"></oa-list-cell>
-				<!-- 个人中心 -->
-				<view class="order-section">
-					<view class="category" v-for="(item, index) in applicationList.list" :key="index"
-						@tap.stop="navTo(item.url)">
-						<view class="order-item">
-							<view class="img">
-								<text class="iconfont" :class="[item.icon, 'text-'+themeColor.name]"></text>
-							</view>
-							<view class="text">{{ item.title }}</view>
-							<oa-badge v-if="item.num>0" type="error" size="small" class="badge" :text="item.num">
-							</oa-badge>
-						</view>
-
-					</view>
-				</view>
-
-			</view>
 			<!-- 个人资料 -->
 			<view class="set">
 				<view class="list-cell b-b" :class="{ 'm-t': item.class === 'mT' }" v-for="item in setList"
@@ -120,48 +90,9 @@
 	export default {
 		data() {
 			return {
-				applicationList: {
-					"title": "个人管理",
-					"list": [{
-						"title": "我的公告",
-						"name": "Announce",
-						"icon": "icontongzhi",
-						"url": "/pages/application/Announce/index",
-						"num": 4
-					}, {
-						"title": "我的日程",
-						"name": "Calendar",
-						"icon": "iconricheng",
-						"url": "/pages/application/Calendar/index",
-						"num": 0
-					}, {
-						"title": "我的日志",
-						"name": "DailyWork",
-						"icon": "iconzongjie",
-						"url": "/pages/application/DailyWork/index",
-						"num": 0
-					}, {
-						"title": "我的消息",
-						"name": "Message",
-						"icon": "iconxiaoxi7",
-						"url": "/pages/application/Message/index",
-						"num": 1
-					}, {
-						"title": "我的总结",
-						"name": "Summary",
-						"icon": "iconicon-test21",
-						"url": "/pages/application/Summary/index",
-						"num": 0
-					}]
-				},
 				userInfo: {
 					'realname': '张三',
 					'mobile': '18986860001'
-				},
-				siteInfo: {
-					"web_site_title": "维博网络科技",
-					"web_about_me": "维博网络是一家提供高品质软件开发服务的精英团队",
-					"web_contact": "联系地址:湖北省武汉市 联系方式QQ:21931118 我们可以为您提供全平台应用程序及游戏开发，其中包括移动应用程序"
 				},
 				colorModal: false,
 				mycenterList: this.$mConstDataConfig.mycenterList,
@@ -181,7 +112,6 @@
 		},
 		onLoad() {
 			this.setList[2].content = `${uni.getStorageInfoSync().currentSize} kb`;
-			this.setList[5].content = `当前版本 2.1.1`;
 			uni.setTabBarStyle({
 				selectedColor: this.themeColor.color,
 				borderStyle: 'white'

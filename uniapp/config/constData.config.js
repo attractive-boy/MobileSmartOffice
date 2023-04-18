@@ -34,31 +34,7 @@ export default {
 			title: '清除缓存',
 			url: 'clearCache',
 			content: ''
-		},
-		{
-			title: '关于我们',
-			url: '/pages/set/about/about',
-			content: '',
-			class: 'mT'
-		},
-		{
-			title: '站点帮助',
-			url: '/pages/application/HelpCenter/index',
-			content: ''
-		},
-		/*  #ifdef APP-PLUS  */
-		{
-			title: '检查更新',
-			url: 'versionUpgrade',
-			content: ''
-		},
-		/*  #endif  */
-		{
-			title: '意见反馈',
-			url: '/pages/application/Feedback/index',
-			content: ''
-		},
-
+		}
 	],
 
 

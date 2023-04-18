@@ -1,10 +1,5 @@
 <template>
 	<view class="works">
-		<!--搜索导航栏-->
-		<view class="works-search" @tap="navTo(`/pages/index/search/search?keyword=搜索我的工作&type=works`)">
-			<view class="works-search-input">请输入工作关键字</view>
-			<view class="iconfont iconsousuo2"></view>
-		</view>
 		<!--导航栏-->
 		<view class="navbar">
 			<view v-for="(item, index) in navList" :key="index" class="nav-item"
