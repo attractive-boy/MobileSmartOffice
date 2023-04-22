@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mobile.smartoffice.api.mapper.LocationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mobile.smartoffice.api.entity.Location">
+        <id column="id" property="id" />
+        <result column="attendance_id" property="attendanceId" />
+        <result column="lng" property="lng" />
+        <result column="lat" property="lat" />
+        <result column="country" property="country" />
+        <result column="province" property="province" />
+        <result column="city" property="city" />
+        <result column="district" property="district" />
+        <result column="street" property="street" />
+        <result column="street_number" property="streetNumber" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, attendance_id, lng, lat, country, province, city, district, street, street_number
+    </sql>
+
+</mapper>
