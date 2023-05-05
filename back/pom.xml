@@ -12,11 +12,6 @@
     <artifactId>back</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
-    <name>back</name>
-    <description>支持 OAuth 2.1 JWT 授权的飞书平台网页应用开发组件</description>
-    <url>https://github.com/xuxiaowei-com-cn/back</url>
-    <inceptionYear>2022</inceptionYear>
-
     <properties>
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -24,15 +19,8 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <guava.version>31.1-jre</guava.version>
 
-        <!-- OAuth 2.1 依赖 -->
-        <!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-oauth2-authorization-server -->
-        <!-- https://oss.sonatype.org/content/repositories/public/org/springframework/security/spring-security-oauth2-authorization-server -->
-        <!-- https://repo.spring.io/ui/native/milestone/org/springframework/security/spring-security-oauth2-authorization-server -->
-        <!-- https://github.com/spring-projects/spring-authorization-server -->
         <spring-security-oauth2-authorization-server.version>0.4.1
         </spring-security-oauth2-authorization-server.version>
 
@@ -60,29 +48,12 @@
 
     </properties>
     <dependencies>
-
-        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
         </dependency>
 
-        <!-- OAuth 2.1 依赖，支持 spring-boot 2.7.x -->
-        <!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-oauth2-authorization-server -->
-        <!-- https://oss.sonatype.org/content/repositories/public/org/springframework/security/spring-security-oauth2-authorization-server -->
-        <!-- https://repo.spring.io/ui/native/milestone/org/springframework/security/spring-security-oauth2-authorization-server -->
-        <!-- https://github.com/spring-projects/spring-authorization-server -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-authorization-server</artifactId>
-            <version>${spring-security-oauth2-authorization-server.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
@@ -92,11 +63,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -136,52 +102,20 @@
 
     </scm>
 
-    <issueManagement>
-        <system>Github</system>
-        <url>https://github.com/xuxiaowei-com-cn/back/issues</url>
-    </issueManagement>
-
-    <organization>
-        <name>徐晓伟工作室</name>
-        <url>http://xuxiaowei.com.cn</url>
-    </organization>
-
-    <developers>
-        <developer>
-            <name>徐晓伟</name>
-            <email>xuxiaowei@xuxiaowei.com.cn</email>
-            <organization>徐晓伟工作室</organization>
-            <organizationUrl>http://xuxiaowei.com.cn</organizationUrl>
-        </developer>
-    </developers>
 
     <build>
-
-        <!-- mvn clean lombok:delombok -->
-        <!-- mvn source:jar javadoc:jar deploy -DskipTests -->
-
         <plugins>
-
-            <!-- mvn clean deploy -DskipTests -->
-            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
             </plugin>
-
-            <!-- mvn clean source:jar deploy -->
-            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>${maven-source-plugin.version}</version>
             </plugin>
 
-            <!-- 列举开源协议：mvn license:license-list -->
-            <!-- 添加开源协议：mvn license:update-file-header -->
-            <!-- http://www.mojohaus.org/license-maven-plugin/index.html -->
-            <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/license-maven-plugin -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -191,8 +125,6 @@
                 </configuration>
             </plugin>
 
-            <!-- mvn lombok:delombok -->
-            <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok-maven-plugin -->
             <plugin>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok-maven-plugin</artifactId>
@@ -212,10 +144,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- mvn lombok:delombok -->
-            <!-- mvn javadoc:jar deploy -->
-            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -225,11 +153,8 @@
                     <encoding>UTF-8</encoding>
                     <charset>UTF-8</charset>
                     <docencoding>UTF-8</docencoding>
-                    <!--<doclint>none</doclint>-->
                 </configuration>
             </plugin>
-
-            <!-- https://mvnrepository.com/artifact/pl.project13.maven/git-commit-id-plugin -->
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
@@ -257,11 +182,6 @@
                 </configuration>
             </plugin>
 
-            <!--
-                ./mvnw spring-javaformat:apply
-                mvn spring-javaformat:apply
-             -->
-            <!-- https://mvnrepository.com/artifact/io.spring.javaformat/spring-javaformat-maven-plugin -->
             <plugin>
                 <groupId>io.spring.javaformat</groupId>
                 <artifactId>spring-javaformat-maven-plugin</artifactId>

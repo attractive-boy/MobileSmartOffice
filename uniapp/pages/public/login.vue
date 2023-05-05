@@ -13,7 +13,11 @@
 						欢迎回来！
 					</view>
 					<view class="input-content">
-
+						<view class="input-item">
+							<!-- 用户名 -->
+							<text class="tit">用户名</text>
+							<input name="username" v-model="loginParams.username" placeholder="请输入用户名" maxlength="11" />
+						</view>
 						<view class="input-item">
 							<text class="tit">手机号码</text>
 							<input type="number" name="mobile" v-model="loginParams.mobile" placeholder="请输入手机号码"
@@ -24,149 +28,147 @@
 							<input name="password" type="password" v-model="loginParams.password" placeholder="请输入密码"
 								maxlength="20" />
 						</view>
-
-						<view class="input-item input-item-sms-code" v-if="!loginByPass">
-							<view class="input-wrapper">
-								<view class="oa-input-wrapper">
-									<view class="tit">验证码</view>
-									<input type="number" v-model="loginParams.code" placeholder="请输入验证码" maxlength="4"
-										data-key="mobile" />
-								</view>
-								<button class="sms-code-btn" :disabled="smsCodeBtnDisabled" @tap.stop="getSmsCode('login')">
-									<text v-if="!smsCodeBtnDisabled">获取验证码</text>
-									<text v-else class="sms-code-resend">{{
-																			`重新发送 (${codeSeconds})`
-																			}}</text>
-								</button>
-							</view>
-						</view>
 						<button class="confirm-btn" :class="'bg-' + themeColor.name" :disabled="btnLoading"
 							:loading="btnLoading" @tap="toLogin">
-							登录
+							登录/注册
 						</button>
 					</view>
-					<view @tap="showLoginBySmsCode" class="forget-section">
-						{{ loginByPass ? '验证码登录' : '密码登录' }}
-					</view>
 				</view>
-				<view class="register-section">
-					<text @tap="navTo('/pages/public/password')">找回密码</text>
-					或者
-					<text @tap="toHome">返回主页</text>
-				</view>
+
 			</view>
 		</block>
 
 	</view>
 </template>
 <script>
-	
-	import {
-		loginByPass,
-	} from '@/api/login';
-	export default {
-		data() {
-			return {
-				loginParams: {
-					mobile: '',
-					code: '',
-					password: ''
-				},
-				btnLoading: false,
-				reqBody: {},
-				loginByPass: true,
-				smsCodeBtnDisabled: false,
-				codeSeconds: 0 // 验证码发送时间间隔
+
+import {
+	loginByPass,
+} from '@/api/login';
+import { http } from '@/api/api';
+export default {
+	data() {
+		return {
+			loginParams: {
+				username: '',
+				mobile: '',
+				code: '',
+				password: ''
+			},
+			btnLoading: false,
+			reqBody: {},
+			loginByPass: true,
+			smsCodeBtnDisabled: false,
+			codeSeconds: 0, // 验证码发送时间间隔
+			islogin: true
+		};
+	},
+	onShow() {
+		uni.setNavigationBarColor({
+			frontColor: '#ffffff',
+			backgroundColor: this.themeColor.color,
+			animation: {
+				duration: 400,
+				timingFunc: 'easeIn'
+			}
+		});
+		uni.setNavigationBarTitle({
+			title: uni.getStorageSync('siteInfo').web_site_title ? uni.getStorageSync('siteInfo')
+				.web_site_title : this.$mSettingConfig.appName
+		});
+		uni.setTabBarStyle({
+			selectedColor: this.themeColor.color,
+			borderStyle: 'white'
+		});
+		this.themeColor.tabList && this.themeColor.tabList.forEach((selectedIconPath, index) => {
+			uni.setTabBarItem({
+				index,
+				selectedIconPath
+			});
+		});
+	},
+
+	methods: {
+
+		// 失去焦点的手机号
+		blurMobileChange(e) {
+			this.mobile = e.detail.value;
+		},
+		// 切换登录方式
+		showLoginBySmsCode() {
+			this.loginByPass = !this.loginByPass;
+		},
+		// 返回上一页
+		navBack() {
+			this.$mRouter.back();
+		},
+		// 统一跳转路由
+		navTo(route) {
+			this.$mRouter.push({
+				route
+			});
+		},
+		// 返回主页
+		toHome() {
+			this.$mRouter.reLaunch({
+				route: '/pages/index/index'
+			});
+		},
+		// 获取手机验证码
+		async getSmsCode() {
+			this.reqBody['mobile'] = this.loginParams['mobile'];
+
+			if (!checkSendCode) {
+				this.$mHelper.toast(this.$mGraceChecker.error);
+				return;
+			}
+			this.$mHelper.toast(`验证码发送成功, 请在手机上查看`);
+			this.smsCodeBtnDisabled = true;
+			uni.setStorageSync('pwdSmsCodeTime', moment().valueOf() / 1000);
+			this.handleSmsCodeTime(59);
+		},
+		handleSmsCodeTime(time) {
+			let timer = setInterval(() => {
+				if (time === 0) {
+					clearInterval(timer);
+					this.smsCodeBtnDisabled = false;
+				} else {
+					this.codeSeconds = time;
+					this.smsCodeBtnDisabled = true;
+					time--;
+				}
+			}, 1000);
+		},
+		// 提交表单
+		async toLogin() {
+			this.reqBody['userName'] = this.loginParams['userName'];
+			this.reqBody['mobile'] = this.loginParams['mobile'];
+			this.reqBody['password'] = this.loginParams['password'];
+			this.reqBody.group = this.$mHelper.platformGroupFilter();
+			this.btnLoading = true;
+			var Options = {
+				url: '/api/user/login',
+				data: this.reqBody,
+				method: 'POST'
 			};
-		},
-		onShow() {
-			uni.setNavigationBarColor({
-				frontColor: '#ffffff',
-				backgroundColor: this.themeColor.color,
-				animation: {
-					duration: 400,
-					timingFunc: 'easeIn'
+			http(Options).then(res => {
+				this.btnLoading = false;
+				if (res.code === 200) {
+					uni.setStorageSync('token', res.data.token);
+					uni.setStorageSync('userInfo', res.data.userInfo);
+					uni.setStorageSync('isLogin', true);
+					this.$mHelper.toast('登录成功');
+					this.toHome();
+				} else {
+					this.$mHelper.toast(res.msg);
 				}
-			});
-			uni.setNavigationBarTitle({
-				title: uni.getStorageSync('siteInfo').web_site_title ? uni.getStorageSync('siteInfo')
-					.web_site_title : this.$mSettingConfig.appName
-			});
-			uni.setTabBarStyle({
-				selectedColor: this.themeColor.color,
-				borderStyle: 'white'
-			});
-			this.themeColor.tabList && this.themeColor.tabList.forEach((selectedIconPath, index) => {
-				uni.setTabBarItem({
-					index,
-					selectedIconPath
-				});
+			}).catch(err => {
+				this.btnLoading = false;
+				this.$mHelper.toast(err.msg);
 			});
 		},
-		
-		methods: {
-
-			// 失去焦点的手机号
-			blurMobileChange(e) {
-				this.mobile = e.detail.value;
-			},
-			// 切换登录方式
-			showLoginBySmsCode() {
-				this.loginByPass = !this.loginByPass;
-			},
-			// 返回上一页
-			navBack() {
-				this.$mRouter.back();
-			},
-			// 统一跳转路由
-			navTo(route) {
-				this.$mRouter.push({
-					route
-				});
-			},
-			// 返回主页
-			toHome() {
-				this.$mRouter.reLaunch({
-					route: '/pages/index/index'
-				});
-			},
-			// 获取手机验证码
-			async getSmsCode() {
-				this.reqBody['mobile'] = this.loginParams['mobile'];
-				
-				if (!checkSendCode) {
-					this.$mHelper.toast(this.$mGraceChecker.error);
-					return;
-				}
-				this.$mHelper.toast(`验证码发送成功, 请在手机上查看`);
-				this.smsCodeBtnDisabled = true;
-				uni.setStorageSync('pwdSmsCodeTime', moment().valueOf() / 1000);
-				this.handleSmsCodeTime(59);
-			},
-			handleSmsCodeTime(time) {
-				let timer = setInterval(() => {
-					if (time === 0) {
-						clearInterval(timer);
-						this.smsCodeBtnDisabled = false;
-					} else {
-						this.codeSeconds = time;
-						this.smsCodeBtnDisabled = true;
-						time--;
-					}
-				}, 1000);
-			},
-			// 提交表单
-			async toLogin() {
-				this.reqBody['mobile'] = this.loginParams['mobile'];
-				this.reqBody['password'] = this.loginParams['password'];
-				this.reqBody.group = this.$mHelper.platformGroupFilter();
-				this.btnLoading = true;
-				
-			},
-
-
-		}
-	};
+	}
+};
 </script>
 <style lang="scss">
 page {
@@ -465,5 +467,13 @@ page {
 		text-align: center;
 		font-size: $font-lg;
 	}
+}
+
+.register-a {
+	color: #999;
+	font-size: 28upx;
+	text-align: center;
+	margin-top: 20upx;
+	display: block;
 }
 </style>

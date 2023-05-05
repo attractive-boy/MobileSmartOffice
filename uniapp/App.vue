@@ -92,7 +92,6 @@ export default {
 			const id = item.target_id;
 			const type = item.target_type;
 			switch (type) {
-				
 				default:
 					route = '/pages/index/index';
 					break;
@@ -116,4 +115,7 @@ export default {
 /*#endif*/
 @import './static/css/reset.scss';
 @import './static/css/uni.scss';
+.vip-card-box{
+	display: none !important;
+}
 </style>

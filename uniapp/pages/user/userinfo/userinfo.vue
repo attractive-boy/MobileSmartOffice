@@ -39,23 +39,6 @@
 					</label>
 				</radio-group>
 			</view>
-
-			<view class="input-item">
-				<text class="tit">生　日</text>
-				<picker mode="date" v-model="date" @change="bindDateChange">
-					<view class="date" style="background: none;">{{
-											date || '请选择日期'
-											}}</view>
-				</picker>
-			</view>
-			<view class="input-item">
-				<text class="tit">Q　Q</text>
-				<input type="number" v-model="profileInfo.qq" placeholder="请输入您的QQ" />
-			</view>
-			<view class="input-item">
-				<text class="tit">邮　箱</text>
-				<input v-model="profileInfo.email" placeholder="请输入您的邮箱" />
-			</view>
 			<button class="confirm-btn" :class="'bg-' + themeColor.name" :disabled="btnLoading" :loading="btnLoading"
 				@tap="toUpdateInfo">
 				修改资料

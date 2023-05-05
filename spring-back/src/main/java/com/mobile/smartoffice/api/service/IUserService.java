@@ -13,5 +13,8 @@ import org.apache.shiro.authc.Account;
  * @since 2023-04-22
  */
 public interface IUserService extends IService<User> {
+    //登录或者注册
+    User loginOrRegister(String username,String phone,String password);
 
+    String generateToken(String username, String phone);
 }

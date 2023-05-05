@@ -16,6 +16,10 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String authorization = httpServletRequest.getHeader("Authorization");
 
+        String requestURI = httpServletRequest.getRequestURI();
+        if (requestURI.startsWith("/api/user/")) {   // 忽略/user/路径下的鉴权
+            return true;
+        }
         if (StringUtils.isEmpty(authorization)) {
             return false;
         }
@@ -23,10 +27,6 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         String token = StringUtils.replace(authorization, "Bearer ", "");
         String username = JWT.decode(token).getClaim("username").asString();
         String password = JWT.decode(token).getClaim("password").asString();
-        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
-            return false;
-        }
-
-        return true;
+        return !StringUtils.isEmpty(username) && !StringUtils.isEmpty(password);
     }
 }
