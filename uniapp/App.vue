@@ -8,8 +8,15 @@ import { mapMutations } from 'vuex';
 export default {
 	async onLaunch() {
 		await this.initData();
+		//判断有没有token
+		const token = uni.getStorageSync('token');
+		if (!token) {
+			uni.reLaunch({
+				url: '/pages/public/login'
+			});
+		}
 	},
-	onHide() {},
+	onHide() { },
 	methods: {
 		...mapMutations(['setNotifyNum']),
 		// 数据初始化
@@ -22,7 +29,7 @@ export default {
 			// 5+ push 消息推送 ps:使用:H5+的方式监听，实现推送
 			plus.push.addEventListener(
 				'click',
-				function(msg) {
+				function (msg) {
 					_this.navTo(JSON.parse(msg.content));
 				},
 				false
@@ -30,7 +37,7 @@ export default {
 			// 监听在线消息事件
 			plus.push.addEventListener(
 				'receive',
-				function(msg) {
+				function (msg) {
 					_this.navTo(JSON.parse(msg.content));
 				},
 				false
@@ -49,7 +56,7 @@ export default {
 				await this.handleBindingEquipment(info.clientid, token);
 				// #endif
 			}
-			
+
 		},
 		// 初始化系统信息
 		initSystemInfo() {
@@ -81,11 +88,11 @@ export default {
 		// 设备绑定(app推送)
 		async handleBindingEquipment(id, token) {
 			const oauth_client = uni.getSystemInfoSync().platform;
-		
+
 		},
-		async handleVerifyAccessToken (token) {
-			
-    },
+		async handleVerifyAccessToken(token) {
+
+		},
 		// 推送消息跳转
 		async navTo(item) {
 			let route;
@@ -93,7 +100,7 @@ export default {
 			const type = item.target_type;
 			switch (type) {
 				default:
-					route = '/pages/index/index';
+					route = '/pages/public/login';
 					break;
 			}
 			if (route) this.$mRouter.push({ route });
@@ -115,7 +122,8 @@ export default {
 /*#endif*/
 @import './static/css/reset.scss';
 @import './static/css/uni.scss';
-.vip-card-box{
+
+.vip-card-box {
 	display: none !important;
 }
 </style>

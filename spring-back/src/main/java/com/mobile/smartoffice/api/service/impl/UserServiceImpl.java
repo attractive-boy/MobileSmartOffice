@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.shiro.authc.Account;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +45,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             newUser.setUsername(username);
             newUser.setMobile(phone);
             newUser.setPassword(password);
+            //更新时间和创建时 LocalDateTime类型
+            newUser.setCreateTime(LocalDateTime.now());
+            newUser.setUpdateTime(LocalDateTime.now());
+            //role_id
+            newUser.setRoleId(1);
             //注册成功，返回token
             if(this.save(newUser)){
                 return newUser;

@@ -5,11 +5,10 @@
 			<image class="bg" :src="userBg"></image>
 			<!--用户信息-->
 			<view class="user-info-box">
-				<view class="portrait-box" @tap="navTo(userInfo ? '/pages/user/userinfo/userinfo' : 'login')">
-					<image class="portrait" :src="userInfo.head_portrait || headImg"></image>
+				<view class="portrait-box">
+					<image class="portrait" :src="headImg"></image>
 					<text class="username">
-						{{ userInfo.realname ||'登录/注册'}} {{ '总经理'}}
-						{{ userInfo.mobile || '没有填写手机号'}}
+						{{ userInfo.realname }}
 					</text>
 				</view>
 			</view>
@@ -18,11 +17,11 @@
 		</view>
 		<!-- 个人中心 内容区-->
 		<view class="cover-container" :style="[
-						{
-							transform: coverTransform,
-							transition: coverTransition
-						}
-					]" @touchstart="coverTouchstart" @touchmove="coverTouchmove" @touchend="coverTouchend">
+			{
+				transform: coverTransform,
+				transition: coverTransition
+			}
+		]" @touchstart="coverTouchstart" @touchmove="coverTouchmove" @touchend="coverTouchend">
 			<image class="arc" :src="arc"></image>
 			<!-- 个人资料 -->
 			<view class="set">
@@ -41,8 +40,8 @@
 						<text class="cuIcon-colorlens" :class="'text-' + themeColor.name"></text>
 						<view class="padding solid radius shadow-blur" :class="'bg-' + themeColor.name"></view>
 						<view class="title">主题色：<text :class="'text-' + themeColor.name">{{
-														themeColor.title
-														}}</text></view>
+							themeColor.title
+						}}</text></view>
 					</view>
 					<view class="action">
 						<button class="cu-btn round shadow" @click="showColorModal" :class="'bg-' + themeColor.name">
@@ -82,40 +81,83 @@
 	</view>
 </template>
 <script>
-	
-	import $mAssetsPath from '@/config/assets.config';
-	let startY = 0,
-		moveY = 0,
-		pageAtTop = true;
-	export default {
-		data() {
-			return {
-				userInfo: {
-					'realname': '张三',
-					'mobile': '18986860001'
-				},
-				colorModal: false,
-				mycenterList: this.$mConstDataConfig.mycenterList,
-				themeList: this.$mConstDataConfig.themeList,
-				styleUserIsOpen: this.$mSettingConfig.styleUserIsOpen,
-				setList: this.$mConstDataConfig.setList,
-				headImg: this.$mAssetsPath.headImg,
-				userBg: this.$mAssetsPath.userBg,
-				vipCardBg: this.$mAssetsPath.vipCardBg,
-				arc: this.$mAssetsPath.arc,
-				coverTransform: 'translateY(0px)',
-				coverTransition: '0s',
-				moving: false,
-				loading: true,
-				hasLogin: true
-			};
-		},
-		onLoad() {
-			this.setList[2].content = `${uni.getStorageInfoSync().currentSize} kb`;
-			uni.setTabBarStyle({
-				selectedColor: this.themeColor.color,
-				borderStyle: 'white'
+
+import $mAssetsPath from '@/config/assets.config';
+let startY = 0,
+	moveY = 0,
+	pageAtTop = true;
+export default {
+	data() {
+		return {
+			userInfo: {
+				'realname': uni.getStorageSync('userInfo').username,
+			},
+			colorModal: false,
+			mycenterList: this.$mConstDataConfig.mycenterList,
+			themeList: this.$mConstDataConfig.themeList,
+			styleUserIsOpen: this.$mSettingConfig.styleUserIsOpen,
+			setList: this.$mConstDataConfig.setList,
+			headImg: this.$mAssetsPath.headImg,
+			userBg: this.$mAssetsPath.userBg,
+			vipCardBg: this.$mAssetsPath.vipCardBg,
+			arc: this.$mAssetsPath.arc,
+			coverTransform: 'translateY(0px)',
+			coverTransition: '0s',
+			moving: false,
+			loading: true,
+			hasLogin: true
+		};
+	},
+	onLoad() {
+		this.setList[2].content = `${uni.getStorageInfoSync().currentSize} kb`;
+		uni.setTabBarStyle({
+			selectedColor: this.themeColor.color,
+			borderStyle: 'white'
+		});
+		uni.setNavigationBarColor({
+			frontColor: '#ffffff',
+			backgroundColor: this.themeColor.color,
+			animation: {
+				duration: 400,
+				timingFunc: 'easeIn'
+			}
+		});
+		this.themeColor.tabList && this.themeColor.tabList.forEach((selectedIconPath, index) => {
+			uni.setTabBarItem({
+				index,
+				selectedIconPath
 			});
+		});
+		this.loading = false;
+
+	},
+	onNavigationBarButtonTap(e) {
+		const index = e.index;
+		if (index === 0) {
+			this.navTo('/pages/set/set');
+		}
+	},
+	methods: {
+		// 退出登录
+		toLogout() {
+			uni.showModal({
+				content: '确定要退出登录么',
+				success: e => {
+					if (e.confirm) {
+						uni.reLaunch({
+							url: '/pages/public/login'
+						});
+					}
+				}
+			});
+		},
+		showColorModal() {
+			this.colorModal = true;
+		},
+		SetColor(item) {
+			this.colorModal = false;
+			this.themeColor = item;
+			this.$mStore.commit('setThemeColor', item);
 			uni.setNavigationBarColor({
 				frontColor: '#ffffff',
 				backgroundColor: this.themeColor.color,
@@ -124,124 +166,80 @@
 					timingFunc: 'easeIn'
 				}
 			});
+			uni.setTabBarStyle({
+				selectedColor: this.themeColor.color,
+				borderStyle: 'white'
+			});
 			this.themeColor.tabList && this.themeColor.tabList.forEach((selectedIconPath, index) => {
 				uni.setTabBarItem({
 					index,
 					selectedIconPath
 				});
 			});
-			this.loading = false;
-
 		},
-		onNavigationBarButtonTap(e) {
-			const index = e.index;
-			if (index === 0) {
-				this.navTo('/pages/set/set');
+
+		// 统一跳转接口,拦截未登录路由
+		navTo(route) {
+			if (!route) return;
+			if (!this.hasLogin) {
+				uni.removeStorageSync('backToPage');
+				this.$mRouter.push({
+					route: '/pages/public/login'
+				});
+			} else {
+				if (route === 'clearCache') {
+					uni.showModal({
+						content: '确定要清除缓存吗',
+						success: e => {
+							if (e.confirm) {
+								uni.clearStorageSync();
+								this.setList[2].content = '0 kb';
+								this.$mHelper.toast('清除缓存成功');
+							}
+						}
+					});
+					return;
+				}
+				this.$mRouter.push({
+					route
+				});
 			}
 		},
-		methods: {
-			// 退出登录
-			toLogout() {
-				uni.showModal({
-					content: '确定要退出登录么',
-					success: e => {
-						if (e.confirm) {
-							uni.reLaunch({
-								url: '/pages/public/login'
-							});
-						}
-					}
-				});
-			},
-			showColorModal() {
-				this.colorModal = true;
-			},
-			SetColor(item) {
-				this.colorModal = false;
-				this.themeColor = item;
-				this.$mStore.commit('setThemeColor', item);
-				uni.setNavigationBarColor({
-					frontColor: '#ffffff',
-					backgroundColor: this.themeColor.color,
-					animation: {
-						duration: 400,
-						timingFunc: 'easeIn'
-					}
-				});
-				uni.setTabBarStyle({
-					selectedColor: this.themeColor.color,
-					borderStyle: 'white'
-				});
-				this.themeColor.tabList && this.themeColor.tabList.forEach((selectedIconPath, index) => {
-					uni.setTabBarItem({
-						index,
-						selectedIconPath
-					});
-				});
-			},
 
-			// 统一跳转接口,拦截未登录路由
-			navTo(route) {
-				if (!route) return;
-				if (!this.hasLogin) {
-					uni.removeStorageSync('backToPage');
-					this.$mRouter.push({
-						route: '/pages/public/login'
-					});
-				} else {
-					if (route === 'clearCache') {
-						uni.showModal({
-							content: '确定要清除缓存吗',
-							success: e => {
-								if (e.confirm) {
-									uni.clearStorageSync();
-									this.setList[2].content = '0 kb';
-									this.$mHelper.toast('清除缓存成功');
-								}
-							}
-						});
-						return;
-					}
-					this.$mRouter.push({
-						route
-					});
-				}
-			},
-
-			coverTouchstart(e) {
-				if (pageAtTop === false) {
-					return;
-				}
-				this.coverTransition = 'transform .1s linear';
-				startY = e.touches[0].clientY;
-			},
-			coverTouchmove(e) {
-				moveY = e.touches[0].clientY;
-				let moveDistance = moveY - startY;
-				if (moveDistance < 0) {
-					this.moving = false;
-					return;
-				}
-				this.moving = true;
-				if (moveDistance >= 80 && moveDistance < 100) {
-					moveDistance = 80;
-				}
-				if (moveDistance > 0 && moveDistance <= 80) {
-					this.coverTransform = `translateY(${moveDistance}px)`;
-				}
-			},
-			coverTouchend() {
-				if (this.moving === false) {
-					return;
-				}
+		coverTouchstart(e) {
+			if (pageAtTop === false) {
+				return;
+			}
+			this.coverTransition = 'transform .1s linear';
+			startY = e.touches[0].clientY;
+		},
+		coverTouchmove(e) {
+			moveY = e.touches[0].clientY;
+			let moveDistance = moveY - startY;
+			if (moveDistance < 0) {
 				this.moving = false;
-				this.coverTransition = 'transform 0.3s cubic-bezier(.21,1.93,.53,.64)';
-				this.coverTransform = 'translateY(0px)';
-			},
+				return;
+			}
+			this.moving = true;
+			if (moveDistance >= 80 && moveDistance < 100) {
+				moveDistance = 80;
+			}
+			if (moveDistance > 0 && moveDistance <= 80) {
+				this.coverTransform = `translateY(${moveDistance}px)`;
+			}
+		},
+		coverTouchend() {
+			if (this.moving === false) {
+				return;
+			}
+			this.moving = false;
+			this.coverTransition = 'transform 0.3s cubic-bezier(.21,1.93,.53,.64)';
+			this.coverTransform = 'translateY(0px)';
+		},
 
 
-		}
-	};
+	}
+};
 </script>
 <style lang="scss" scoped>
 page {

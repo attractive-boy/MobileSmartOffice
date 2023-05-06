@@ -224,6 +224,15 @@
 					}
 				}
 
+                ,{
+                    "path" : "Contact/Contact",
+                    "style" :                                                                                    
+                {
+                    "navigationBarTitleText": "",
+                    "enablePullDownRefresh": false
+                }
+                
+                }
             ]
 		}
 

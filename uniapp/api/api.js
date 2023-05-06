@@ -9,6 +9,7 @@ export const http = (options) => {
             data: options.data || {},
             header: { Authorization: uni.getStorageSync('token') },
             success: (res) => {
+                debugger
                 if (res == '') {
                     return uni.showToast({
                         icon: 'loading',

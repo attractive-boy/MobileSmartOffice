@@ -141,31 +141,57 @@ export default {
 		},
 		// 提交表单
 		async toLogin() {
-			this.reqBody['userName'] = this.loginParams['userName'];
+			this.reqBody['username'] = this.loginParams['username'];
 			this.reqBody['mobile'] = this.loginParams['mobile'];
 			this.reqBody['password'] = this.loginParams['password'];
-			this.reqBody.group = this.$mHelper.platformGroupFilter();
 			this.btnLoading = true;
-			var Options = {
+			var options = {
 				url: '/api/user/login',
 				data: this.reqBody,
 				method: 'POST'
 			};
-			http(Options).then(res => {
-				this.btnLoading = false;
-				if (res.code === 200) {
-					uni.setStorageSync('token', res.data.token);
+			const BASE_URL = 'http://localhost:8081';
+			uni.request({
+				url: BASE_URL + options.url,
+				method: options.method || 'GET',
+				data: options.data || {},
+				success: (res) => {
+					if (res.statusCode && res.statusCode !== 200) {
+						uni.showToast({
+							title: res.msg || '网络异常',
+							icon: 'none'
+						});
+						return;
+					}
+					if (res.data.code === 0) {
+						uni.showToast({
+							title: res.data.msg || '网络异常',
+							icon: 'none'
+						});
+						return;
+					}
+					uni.showToast({
+						title: '登录成功',
+						icon: 'none'
+					});
+					uni.setStorageSync('token', res.data.data);
+					console.log(res.data.data);
 					uni.setStorageSync('userInfo', res.data.userInfo);
-					uni.setStorageSync('isLogin', true);
-					this.$mHelper.toast('登录成功');
-					this.toHome();
-				} else {
-					this.$mHelper.toast(res.msg);
+					uni.setStorageSync('islogin', true);
+					this.$mRouter.reLaunch({
+						route: '/pages/index/index'
+					});
+				},
+				fail: (e) => {
+					uni.showToast({
+						title: e.errMsg || '网络异常',
+						icon: 'none'
+					});
+				},
+				complete: () => {
+					this.btnLoading = false;
 				}
-			}).catch(err => {
-				this.btnLoading = false;
-				this.$mHelper.toast(err.msg);
-			});
+			})
 		},
 	}
 };
